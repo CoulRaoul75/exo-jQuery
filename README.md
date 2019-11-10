@@ -1,6 +1,5 @@
 # exo-jQuery
-Exercices jQuery
-avec Sébastien Maloron - M2i formations
+Exercices jQuery avec Sébastien Maloron - M2i formations
 
 Apprendre à parcourir et à manipuler les éléments du DOM avec jQuery
 Les + : faire du code qui s'adapte à la situation (code contextuel)
