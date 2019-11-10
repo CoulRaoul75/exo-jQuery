@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Carrousel</title>
+
+    <link rel="stylesheet" href="/node_modules/slick-1.8.1/slick/slick.css">
+    <link rel="stylesheet" href="/node_modules/slick-1.8.1/slick/slick-theme.css">
+
+    <script src="/node_modules/jquery/dist/jquery.js"></script>
+    <script src="node_modules/slick-1.8.1/slick/slick.js"></script>
+    <script src="node_modules/slick-1.8.1/slick/slick.min.js"></script>
+
+    <style type="text/css">
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        .slider {
+            width: 50%;
+            margin: 100px auto;
+        }
+        .slick-slide {
+            margin: 0px 20px;
+        }
+        .slick-slide img {
+            width: 100%;
+        }
+        .slick-prev:before,
+        .slick-next:before {
+            color: black;
+        }
+        .slick-slide {
+            transition: all ease-in-out .3s;
+            opacity: .2;
+        }
+        .slick-active {
+            opacity: .5;
+        }
+        .slick-current {
+            opacity: 1;
+        }
+    </style>
+
+</head>
+
+<body>
+    <section class="variable slider">
+        <div>
+            <img src="/img/1maldives-1993704_640.jpg">
+        </div>
+        <div>
+            <img src="/img/2beach-1236581_640.jpg">
+        </div>
+        <div>
+            <img src="/img/3evening-567840_640.jpg">
+        </div>
+        <div>
+            <img src="/img/4tree-736885_640.jpg">
+        </div>
+    </section>
+
+    <script>
+        $(document).ready(function() {
+            $(".variable").slick({
+                dots: true,
+                infinite: true,
+                variableWidth: true
+            });
+        });
+    </script>
+</body></html>
+
+

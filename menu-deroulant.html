@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Liste de courses</title>
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <style>
+        #menu a {
+            cursor: pointer;
+            background-color: gray;
+            color: antiquewhite !important;
+        }
+
+    </style>
+</head>
+
+<body class="p-4">
+
+    <ul id="menu">
+
+        <li>
+            <a>FRUITS</a>
+            <ul>
+                <li>oranges</li>
+                <li>pommes</li>
+                <li>poires</li>
+            </ul>
+        </li>
+
+
+        <li>
+            <a>LEGUMES</a>
+            <ul>
+                <li>
+                    <a>Racines</a>
+                    <ul>
+                        <li>carottes</li>
+                        <li>panais</li>
+                        <li>pommes de terre</li>
+                    </ul>
+                </li>
+                <li>
+                    <a>Feuilles</a>
+                    <ul>
+                        <li>choux</li>
+                        <li>blette</li>
+                        <li>salade</li>
+                    </ul>
+                </li>
+                <li>
+                    <a>Légumineuses</a>
+                    <ul>
+                        <li>pois chiches</li>
+                        <li>fèves</li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ul>
+
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            //$("ul").not("#menu").hide(500); // par défaut fermé
+
+            // je sélectionne tous les enfants "a" de "#menu
+            $("#menu a").click(function() {
+                // et j'applique sur ses frères une bascule toggle
+                $(this).next("ul").toggle(500);
+            });
+
+        });
+
+    </script>
+
+</body>
+
+</html>

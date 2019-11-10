@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Formulaire</title>
+
+
+    <!--liens dépendances-->
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="node_modules/chosen-js/chosen.min.css">
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="node_modules/chosen-js/chosen.jquery.min.js"></script>
+
+    <!--css-->
+    <style type="text/css">
+        #valid {
+            margin-bottom: 20px;
+        }
+    </style>
+
+    <script>
+        /**************************************
+         * Modélisation d'un livre
+         **************************************/
+
+        // création de la fonction du livre
+        function Book(title, author, editor, genre) {
+            this.title = title;
+            this.author = author;
+            this.editor = editor;
+            this.genre = genre;
+            this.errorMessage = null;
+        }
+
+        // création du prototype validate > saisie
+        Book.prototype.validate = function() {
+            var valid = true;
+
+            //les champs du livre ne peuvent être vide
+            if (this.title.trim() == "" || this.author.trim() == "" || this.editor.trim() == "") {
+                valid = false;
+                this.errorMessage = "Les champs doivent être renseignés";
+            }
+            // le genre du livre ne peut être vide
+            if (this.genre.trim() == "") {
+                valid = false;
+                this.errorMessage = "Merci de renseigner le genre";
+            }
+
+            // gestion des doublons sur le titre du livre
+            var titleToAdd = this.title;
+            var bookExists = bookList.some(function(item) {
+                return item.title == titleToAdd;
+            });
+            if (bookExists) {
+                valid = !bookExists;
+                // ou valid = false;
+                this.errorMessage = "Ce livre existe déjà";
+            }
+            return valid;
+        }
+
+        // création du prototype pour générer 1 ligne de tableau pour 1 livre
+        Book.prototype.renderTableRow = function() {
+            // création ligne
+            var $row = $("<tr></tr>");
+            // création case titre
+            var $titleCell = $("<td></td>");
+            $titleCell.text(this.title);
+            // création case auteur
+            var $authorCell = $("<td></td>");
+            $authorCell.text(this.author);
+            var $editorCell = $("<td></td>");
+            $editorCell.text(this.editor);
+            var $genreCell = $("<td></td>");
+            $genreCell.text(this.genre);
+            // ajout de la cellule dans la ligne
+            $row.append($titleCell).append($authorCell).append($editorCell).append($genreCell);
+
+            // création de la colonne de suppr
+            $deleteCell = $("<td><button class=\"btn btn-danger delete\">supprimer</button></td>");
+            $row.append($deleteCell);
+
+            return $row;
+        }
+
+        // création d'une variable pour déclarer la liste des livres en 1 tableau
+        var bookList = [];
+        // rajout du local storage et modif des données en objet JSON
+        // récupération des données éventuelles stockées en LocalStorage
+        var data = JSON.parse(window.localStorage.getItem("bookList")) || [];
+        for (let item of data) {
+            bookList.push(new Book(item.title, item.author, item.editor, item.genre));
+        }
+        console.log(bookList);
+
+        // création d'une fonction pour générer liste des books dans table
+        renderTable = function() {
+            // création élément table
+            var $table = $("<table class=\"table table-bordered table-striped\" id=\"books\"></table>");
+
+            // création d'une fonction pour générer l'en-tête du tableau
+            var $tablehead = $("<tr><th scope=\"col\">Titre</th><th scope=\"col\">Auteur</th><th scope=\"col\">Editeur</th><th scope=\"col\">Genre</th><th scope=\"col\">Action</th></tr>");
+            $table.append($tablehead);
+
+            // ajout des lignes à la table
+            for (let book of bookList) {
+                $table.append(book.renderTableRow());
+            }
+            // ajout de la table au DOM
+            $("body").append($table);
+        }
+
+
+        // création du DOM
+        $(document).ready(function() {
+
+            // affichage des livres
+            renderTable();
+
+            // ciblage des élements du DOM
+            var $errorDiv = $("#errorDiv");
+            var $titleInput = $("#title");
+            var $authorInput = $("#author");
+            var $editorInput = $("#editor");
+            var $genreInput = $("#genre");
+
+
+            // masquage des erreurs au chargement de la page
+            $errorDiv.hide();
+
+            // capture de l'événement de soumission ou d'envoi du formulaire
+            $("#form1").submit(function(event) {
+                // créer un event pour empêcher le comportement par défaut de submit
+                event.preventDefault();
+                // récupération de la valeur de la saisie
+                var title = $("#title").val();
+                var author = $("#author").val();
+                var editor = $("#editor").val();
+                var genre = $("#genre option:selected").text();
+
+                // construction d'une instance de livre
+                var book = new Book(title, author, editor, genre);
+
+                // Validation de la saisie
+                if (book.validate()) {
+                    // stockage du nouveau livre dans la liste
+                    bookList.push(book);
+                    console.log(bookList);
+                    // masquage des erreurs
+                    $errorDiv.hide();
+                    // réinitialisation du champs titre
+                    $titleInput.val("");
+                    $authorInput.val("");
+                    $editorInput.val("");
+                    $genreInput.val("");
+                    // focus sur le champ titre
+                    $titleInput.focus();
+
+                    // ajout de la ligne au tableau
+                    $("#books").append(book.renderTableRow());
+                    // ajout du livre au localStorage
+                    window.localStorage.setItem("bookList", JSON.stringify(bookList));
+                } else {
+                    console.log("erreur");
+                    // Affichage de l'erreur de saisie
+                    $errorDiv.show();
+                    $errorDiv.text(book.errorMessage);
+                }
+            });
+
+            // suppression d'une ligne du tableau avec le bouton suppr
+            $("body").delegate(".delete", "click", function() {
+                // récupération du titre du livre à supprimer
+                var bookTitle = $(this).parent().parent().children().first().text();
+                // suppression dans le DOM
+                $(this).parent().parent().remove();
+
+                // recherche de la position du livre à suppr
+                var index = bookList.findIndex(function(book) {
+                    return bookTitle == book.title;
+                });
+
+                // suppression du livre dans bookList
+                // splice avec propriété 
+                bookList.splice(index, 1);
+
+                // Enregistrement dans localStorage
+                window.localStorage.setItem("bookList", JSON.stringify(bookList));
+
+            });
+
+            $("#genre").chosen();
+        });
+    </script>
+</head>
+
+<body class="container-fluid">
+    <div class="row justify-content-center">
+
+        <div class="col-md-6">
+            <div class="alert alert-danger mt-2" id="errorDiv">
+                Erreur de saisie
+            </div>
+
+            <form method="post" id="form1">
+                <div class="form-group">
+                    <label for="title">Titre</label>
+                    <input type="text" id="title" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="author">Auteur</label>
+                    <input type="text" id="author" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="editor">Éditeur</label>
+                    <input type="text" id="editor" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <select name="genre" id="genre" data-placeholder="Genre littéraire">
+                        <option value=""></option>
+                        <option value="art">Art</option>
+                        <option value="aventure">Aventure</option>
+                        <option value="bio">Bande-dessinée</option>
+                        <option value="bio">Biographie</option>
+                        <option value="history">Histoire</option>
+                        <option value="youth">Livres jeunesse</option>
+                        <option value="policier">Policier</option>
+                        <option value="romance">Romance</option>
+                        <option value="sf">Science-fiction</option>
+                        <option value="school">Scolaire</option>
+                        <option value="theatre">Théâtre</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-info btn-block" type="submit" id="valid">Ajouter un livre</button>
+            </form>
+        </div>
+    </div>
+</body></html>
